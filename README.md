@@ -1,5 +1,5 @@
 # rpd-git-merge-driver
-A Git Merge Driver for the RPD.
+A Git Merge Driver for the RPD developed by US-Analytics.
 
 Provided through the MIT License. Refer to LICENSE.
 
