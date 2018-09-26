@@ -1,0 +1,3 @@
+[merge "usa-obiee"]
+	name = US-Analytics RPD merge driver.
+	driver = merge-rpd.py %O %A %B
