@@ -84,36 +84,50 @@ def three_way_merge(original, a_current, b_modified, output_name, password, comm
 # main method	
 if __name__ == "__main__":
 	try:
-		# validate input
-		if len(sys.argv) <= 3:
-			raise Exception("Not enough arguments.")
-		original_rpd_path = sys.argv[1]
-		current_rpd_path = sys.argv[2]
-		modified_rpd_path = sys.argv[3]
+		if len(sys.argv) <= 1:
+			raise Excepton("Not enough arguments.")
+		action = sys.argv[1]
 		
-		# some constants we need
-		command_file_name = "commands.usa"
-		rpd_extension = ".rpd"
-		decisions_temp_file = "decisions.csv"
-		
-		# files must have the .rpd extension, so we add it
-		copy_file(original_rpd_path, original_rpd_path+rpd_extension, True)
-		copy_file(current_rpd_path, current_rpd_path+rpd_extension, True)
-		copy_file(modified_rpd_path, modified_rpd_path+rpd_extension, True)
-
-		# decisions file must not be empty
-		write_file(decisions_temp_file, "Decision\n")
-		
-		# perform the merge
-		three_way_merge(original_rpd_path+rpd_extension, current_rpd_path+rpd_extension, modified_rpd_path+rpd_extension, current_rpd_path, rpd_password, command_file_name)
-		
-		# delete all the temp files we created
-		delete_file(current_rpd_path+rpd_extension)
-		delete_file(modified_rpd_path+rpd_extension)
-		delete_file(original_rpd_path+rpd_extension)
-		delete_file(command_file_name)
-		delete_file(decisions_temp_file)
-		
+		# merge actions
+		if action == "merge":
+			# validate input
+			if len(sys.argv) <= 3:
+				raise Exception("Not enough arguments for merge.")
+			original_rpd_path = sys.argv[1]
+			current_rpd_path = sys.argv[2]
+			modified_rpd_path = sys.argv[3]
+			
+			# some constants we need
+			command_file_name = "commands.usa"
+			rpd_extension = ".rpd"
+			decisions_temp_file = "decisions.csv"
+			
+			# files must have the .rpd extension, so we add it
+			copy_file(original_rpd_path, original_rpd_path+rpd_extension, True)
+			copy_file(current_rpd_path, current_rpd_path+rpd_extension, True)
+			copy_file(modified_rpd_path, modified_rpd_path+rpd_extension, True)
+	
+			# decisions file must not be empty
+			write_file(decisions_temp_file, "Decision\n")
+			
+			# perform the merge
+			three_way_merge(original_rpd_path+rpd_extension, current_rpd_path+rpd_extension, modified_rpd_path+rpd_extension, current_rpd_path, rpd_password, command_file_name)
+			
+			# delete all the temp files we created
+			delete_file(current_rpd_path+rpd_extension)
+			delete_file(modified_rpd_path+rpd_extension)
+			delete_file(original_rpd_path+rpd_extension)
+			delete_file(command_file_name)
+			delete_file(decisions_temp_file)
+		elif action == "diff":
+			# diff actions
+			# validate inputs
+			print(sys.argv)
+			exit()
+			if len(sys.argv) <= 2:
+				raise Exception("Not enough arguments for diff.");	
+		else:
+			raise Exception("No valid action found: '"+action+"'. Valid actions: (merge, diff)");
 		exit(0)
 	except Exception as e:
 		print("Error - "+str(e))
