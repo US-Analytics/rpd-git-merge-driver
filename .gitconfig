@@ -6,4 +6,4 @@
 	driver = merge-rpd.py merge %O %A %B
 [diff "usa-obiee-diff"]
 	name = US-Analytics RPD diff driver.
-	command = merge-rpd.py diff %O %A %B
+	command = merge-rpd.py diff
