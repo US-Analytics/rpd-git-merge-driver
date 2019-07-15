@@ -25,12 +25,12 @@ from shutil import copyfile
 from subprocess import Popen, PIPE, STDOUT, call
 import subprocess
 from glob import glob
+import csv
 
 # Input Parameters
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
-repository_path = "C:\\Users\Administrator\\Desktop\\rpd-devops-test\\"
-
+repository_path = "C:\\Users\Administrator\\Desktop\\rpds\\rpd-devops-test\\"
 
 # save a file with the body of contents to a file named filename
 def write_file(filename, contents):
@@ -84,9 +84,10 @@ def three_way_merge(original, a_current, b_modified, output_name, password, comm
 
 
 # perform comparison of RPD files
-def compare_rpd(current_file, other_file, output_file):
+def compare_rpd(current_file, other_file, output_file, password, command_file_name):
 	try:
-		command_body = "OpenOffline "+current_file + " " + password
+		command_body = "Hide"
+		command_body += "\nOpenOffline "+current_file + " " + password
 		command_body += "\nCompare "+other_file+ " " + password + " " + output_file
 		command_body += "\nClose"
 		command_body += "\nExit"
@@ -105,9 +106,9 @@ def execute_rpd_commands(command_file_name):
 	command_string = [admin_tool_exe, "/Command", repository_path+command_file_name]
 	p = Popen(command_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out, err = p.communicate()
-        errcode = p.returncode
-        if errcode != 0:
-                raise Exception("Command failed: "+str(errcode))
+	errcode = p.returncode
+	if errcode != 0:
+		raise Exception("Command failed: "+str(errcode))
 
 
 # main method	
@@ -151,16 +152,40 @@ if __name__ == "__main__":
 		elif action == "diff":
 			# diff actions
 			# validate inputs
-			if len(sys.argv) <= 3:
+			if len(sys.argv) <= 7:
 				raise Exception("Not enough arguments for diff.");	
-			local_file = sys.argv[2]
-			remote_file = sys.argv[3]
-			output_file_path = "./tmp/compare.csv"
+			my_file = sys.argv[2]
+			first_file = sys.argv[3]
+			second_file = sys.argv[6]
+			
+			# constants we need
+			output_file_path = repository_path + "comparison_output.csv"
+			command_file_name = "commands.usa"
 			
 			# execute the compareRPD using the two files, saving as a CSV file
-			compare_rpd(local_file, remote_file, output_file)
+			compare_rpd(second_file, first_file, output_file_path, rpd_password, command_file_name)
 
+			# clean up
+			delete_file(command_file_name)
+			
 			# parse the output file
+			with open(output_file_path, "r") as csv_file:
+				reader = csv.reader(csv_file)
+				print("diff --git a/"+my_file+" b/"+my_file)
+				print('''@@ -1, 1 @@''')
+				for row in reader:
+					item_name = str(row[0])
+					item_change = str(row[1])
+					item_type = str(row[2])
+					item_location = str(row[3])
+					item_change_icon = "+"
+					if item_change == "Deleted":
+						item_change_icon = "-"
+					print(""+item_change_icon + " ("+item_change+") "+item_type+ " with name "+item_name+" in "+item_location+" layer.")
+			
+			# clean up
+			delete_file(command_file_name)
+			delete_file(output_file_path)
 		else:
 			raise Exception("No valid action found: '"+action+"'. Valid actions: (merge, diff)");
 		exit(0)
