@@ -40,6 +40,7 @@ def write_file(filename, contents):
 		f.close()
 	except Exception as e:
 		raise Exception("Error writing to file: "+str(e))
+
 			
 # delete a file from the file system			
 def delete_file(f):
@@ -52,6 +53,7 @@ def delete_file(f):
 	except Exception as e:
 		raise Exception("Error deleting file: "+str(e))
 
+
 # copy a file from the orig location to the dest location (optionally delete original)
 def copy_file(orig, dest, delete=False):
 	try:
@@ -61,41 +63,68 @@ def copy_file(orig, dest, delete=False):
 				delete_file(f)
 	except Exception as e:
 		raise Exception("Error copying file: "+str(e))
+
 			
 # perform the three way merge for the RPD		
 def three_way_merge(original, a_current, b_modified, output_name, password, command_file_name):
-	command_body = "OpenOffline " + a_current + " " + password
-	command_body += "\nMerge "+original+" "+b_modified+" decisions.csv "+password+" "+password+" "+output_name
-	command_body += "\nSaveAs "+output_name
-	command_body += "\nClose"
-	command_body += "\nExit"
+	try:
+		command_body = "OpenOffline " + a_current + " " + password
+		command_body += "\nMerge "+original+" "+b_modified+" decisions.csv "+password+" "+password+" "+output_name
+		command_body += "\nSaveAs "+output_name
+		command_body += "\nClose"
+		command_body += "\nExit"
+			
+		# save args file
+		write_file(command_file_name, command_body)
 		
-	# save args file
-	write_file(command_file_name, command_body)
+		# execute
+		execute_rpd_commands(command_file_name)
+	except Exception as e:
+		raise Exception("Merge RPD failed: "+str(e))
+
+
+# perform comparison of RPD files
+def compare_rpd(current_file, other_file, output_file):
+	try:
+		command_body = "OpenOffline "+current_file + " " + password
+		command_body += "\nCompare "+other_file+ " " + password + " " + output_file
+		command_body += "\nClose"
+		command_body += "\nExit"
 	
-	#execute command
+		# save args file
+		write_file(command_file_name, command_body)
+			
+		# execute
+		execute_rpd_commands(command_file_name)
+	except Exception as e:
+		raise Exception("Compare RPD failed: "+str(e))
+
+
+# execute an rpd command
+def execute_rpd_commands(command_file_name):
 	command_string = [admin_tool_exe, "/Command", repository_path+command_file_name]
 	p = Popen(command_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out, err = p.communicate()
-	errcode = p.returncode
-	if errcode != 0:
-		raise Exception("Merge failed: "+str(errcode))
-		
+        errcode = p.returncode
+        if errcode != 0:
+                raise Exception("Command failed: "+str(errcode))
+
+
 # main method	
 if __name__ == "__main__":
 	try:
 		if len(sys.argv) <= 1:
-			raise Excepton("Not enough arguments.")
+			raise Exception("Not enough arguments.")
 		action = sys.argv[1]
 		
 		# merge actions
 		if action == "merge":
 			# validate input
-			if len(sys.argv) <= 3:
+			if len(sys.argv) <= 4:
 				raise Exception("Not enough arguments for merge.")
-			original_rpd_path = sys.argv[1]
-			current_rpd_path = sys.argv[2]
-			modified_rpd_path = sys.argv[3]
+			original_rpd_path = sys.argv[2]
+			current_rpd_path = sys.argv[3]
+			modified_rpd_path = sys.argv[4]
 			
 			# some constants we need
 			command_file_name = "commands.usa"
@@ -122,10 +151,16 @@ if __name__ == "__main__":
 		elif action == "diff":
 			# diff actions
 			# validate inputs
-			print(sys.argv)
-			exit()
-			if len(sys.argv) <= 2:
+			if len(sys.argv) <= 3:
 				raise Exception("Not enough arguments for diff.");	
+			local_file = sys.argv[2]
+			remote_file = sys.argv[3]
+			output_file_path = "./tmp/compare.csv"
+			
+			# execute the compareRPD using the two files, saving as a CSV file
+			compare_rpd(local_file, remote_file, output_file)
+
+			# parse the output file
 		else:
 			raise Exception("No valid action found: '"+action+"'. Valid actions: (merge, diff)");
 		exit(0)
