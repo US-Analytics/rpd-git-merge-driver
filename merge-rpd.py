@@ -40,7 +40,6 @@ import csv
 # Input Parameters
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
-repository_path = "C:\\Users\Administrator\\Desktop\\rpds\\rpd-devops-test\\"
 
 # save a file with the body of contents to a file named filename
 def write_file(filename, contents):
@@ -131,16 +130,17 @@ if __name__ == "__main__":
 		# merge actions
 		if action == "merge":
 			# validate input
-			if len(sys.argv) <= 4:
+			if len(sys.argv) <= 5:
 				raise Exception("Not enough arguments for merge.")
 			original_rpd_path = sys.argv[2]
 			current_rpd_path = sys.argv[3]
 			modified_rpd_path = sys.argv[4]
+			repository_path = os.getcwd()
 			
 			# some constants we need
-			command_file_name = repository_path+"commands.usa"
+			command_file_name = repository_path+os.path.sep+"commands.usa"
 			rpd_extension = ".rpd"
-			decisions_temp_file = repository_path+"decisions.csv"
+			decisions_temp_file = repository_path+os.path.sep+"decisions.csv"
 			
 			# files must have the .rpd extension, so we add it
 			copy_file(original_rpd_path, original_rpd_path+rpd_extension, True)
@@ -167,10 +167,11 @@ if __name__ == "__main__":
 			my_file = sys.argv[2]
 			first_file = sys.argv[3]
 			second_file = sys.argv[6]
+			repository_path = os.getcwd()
 			
 			# constants we need
-			output_file_path = repository_path+"comparison_output.csv"
-			command_file_name = repository_path+"commands.usa"
+			output_file_path = repository_path+os.path.sep+"comparison_output.csv"
+			command_file_name = repository_path+os.path.sep+"commands.usa"
 			
 			# execute the compareRPD using the two files, saving as a CSV file
 			compare_rpd(second_file, first_file, output_file_path, rpd_password, command_file_name)
