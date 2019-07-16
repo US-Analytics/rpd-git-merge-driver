@@ -4,15 +4,25 @@
 US-Analytics 
 RPD Merge Script
 
-This script allows merges RPD files automatically. The variables at the top of this script must be updated.
+This script allows merges  and diffs of RPD files automatically. The variables at the top of this script must be updated.
 
 The Git repository must include the .gitattributes file with the below body:
-*.rpd merge=usa-obiee
+*.rpd merge=usa-obiee-merge
+*.rpd diff=usa-obiee-diff
 
 Add the below content to the .gitconfig file (use 'git config --global --list --show-origin' to find it):
 [merge "usa-obiee"]
-	name = US-Analytics RPD merge driver.
-	driver = merge-rpd.py %O %A %B
+        name = US-Analytics RPD merge driver.
+        driver = merge-rpd.py merge %O %A %B
+[merge "usa-obiee-merge"]
+        name = US-Analytics RPD merge driver.
+        driver = merge-rpd.py merge %O %A %B
+[diff "usa-obiee-diff"]
+        name = US-Analytics RPD diff driver.
+        command = merge-rpd.py diff
+[difftool "usa-obiee-diff"]
+        name = US-Analytics RPD diff driver.
+        cmd = merge-rpd.py diff
 
 Examples of the above files are included in this repository.
 
@@ -30,7 +40,7 @@ import csv
 # Input Parameters
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
-repository_path = "C:\\Users\Administrator\\Desktop\\rpds\\rpd-devops-test\\"
+repository_path = "C:\\Users\Administrator\\Desktop\\rpdfolder\\"
 
 # save a file with the body of contents to a file named filename
 def write_file(filename, contents):
@@ -103,7 +113,7 @@ def compare_rpd(current_file, other_file, output_file, password, command_file_na
 
 # execute an rpd command
 def execute_rpd_commands(command_file_name):
-	command_string = [admin_tool_exe, "/Command", repository_path+command_file_name]
+	command_string = [admin_tool_exe, "/Command", command_file_name]
 	p = Popen(command_string, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	out, err = p.communicate()
 	errcode = p.returncode
@@ -128,9 +138,9 @@ if __name__ == "__main__":
 			modified_rpd_path = sys.argv[4]
 			
 			# some constants we need
-			command_file_name = "commands.usa"
+			command_file_name = repository_path+"commands.usa"
 			rpd_extension = ".rpd"
-			decisions_temp_file = "decisions.csv"
+			decisions_temp_file = repository_path+"decisions.csv"
 			
 			# files must have the .rpd extension, so we add it
 			copy_file(original_rpd_path, original_rpd_path+rpd_extension, True)
@@ -159,8 +169,8 @@ if __name__ == "__main__":
 			second_file = sys.argv[6]
 			
 			# constants we need
-			output_file_path = repository_path + "comparison_output.csv"
-			command_file_name = "commands.usa"
+			output_file_path = repository_path+"comparison_output.csv"
+			command_file_name = repository_path+"commands.usa"
 			
 			# execute the compareRPD using the two files, saving as a CSV file
 			compare_rpd(second_file, first_file, output_file_path, rpd_password, command_file_name)
