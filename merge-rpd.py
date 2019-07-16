@@ -40,7 +40,7 @@ import csv
 # Input Parameters
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
-repository_path = "C:\\Users\Administrator\\Desktop\\rpdfolder\\"
+repository_path = "C:\\Users\Administrator\\Desktop\\rpds\\rpd-devops-test\\"
 
 # save a file with the body of contents to a file named filename
 def write_file(filename, contents):
@@ -174,15 +174,13 @@ if __name__ == "__main__":
 			
 			# execute the compareRPD using the two files, saving as a CSV file
 			compare_rpd(second_file, first_file, output_file_path, rpd_password, command_file_name)
-
-			# clean up
-			delete_file(command_file_name)
 			
 			# parse the output file
+			output_string = ""
 			with open(output_file_path, "r") as csv_file:
 				reader = csv.reader(csv_file)
-				print("diff --git a/"+my_file+" b/"+my_file)
-				print('''@@ -1, 1 @@''')
+				output_string += "diff --git a/"+my_file+" b/"+my_file
+				output_string += "\n@@ -1, 1 @@"
 				for row in reader:
 					item_name = str(row[0])
 					item_change = str(row[1])
@@ -191,13 +189,16 @@ if __name__ == "__main__":
 					item_change_icon = "+"
 					if item_change == "Deleted":
 						item_change_icon = "-"
-					print(""+item_change_icon + " ("+item_change+") "+item_type+ " with name "+item_name+" in "+item_location+" layer.")
+					output_string+="\n"+item_change_icon + " ("+item_change+") "+item_type+ " with name "+item_name+" in "+item_location+" layer."
 			
 			# clean up
 			delete_file(command_file_name)
 			delete_file(output_file_path)
+			print(output_string)
 		else:
 			raise Exception("No valid action found: '"+action+"'. Valid actions: (merge, diff)");
+		
+		# exit with success code
 		exit(0)
 	except Exception as e:
 		print("Error - "+str(e))
