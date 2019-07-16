@@ -60,7 +60,8 @@ def delete_file(f):
 		if os.path.exists(f):
 			os.remove(f)
 	except Exception as e:
-		raise Exception("Error deleting file: "+str(e))
+		#raise Exception("Error deleting file: "+str(e))
+		pass
 
 
 # copy a file from the orig location to the dest location (optionally delete original)
