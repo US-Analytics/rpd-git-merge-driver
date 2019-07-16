@@ -41,6 +41,7 @@ import csv
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
 
+
 # save a file with the body of contents to a file named filename
 def write_file(filename, contents):
 	try:

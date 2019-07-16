@@ -3,3 +3,4 @@ commands.usa
 comparison_output.csv
 decisions.csv
 .*.rpd
+merge.log
