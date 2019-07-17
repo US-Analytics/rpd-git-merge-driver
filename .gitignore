@@ -4,3 +4,4 @@ comparison_output.csv
 decisions.csv
 .*.rpd
 merge.log
+merge-rpd.py.log

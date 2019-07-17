@@ -143,8 +143,9 @@ def execute_rpd_commands(command_file_name):
 # main method	
 if __name__ == "__main__":
 	try:
+		# setting up logging
 		if logs:
-			logging.basicConfig(filename="merge.log",level=logging.DEBUG)
+			logging.basicConfig(filename=os.path.abspath(__file__)+".log",level=logging.DEBUG)
 
 		if len(sys.argv) <= 1:
 			log(logging.ERROR, "No action argument provided.")
