@@ -37,6 +37,7 @@ from subprocess import Popen, PIPE, STDOUT, call
 import subprocess
 from glob import glob
 import csv
+import uuid
 
 # Input Parameters
 rpd_password = "Password01"
@@ -45,9 +46,10 @@ logs = True
 # End Input Parameters
 
 # write to the log
+session = uuid.uuid4()
 def log(level, message):
 	if logs:
-		logging.log(level, message)
+		logging.log(level, session+": "+message)
 
 
 # save a file with the body of contents to a file named filename
