@@ -49,7 +49,7 @@ logs = True
 session = uuid.uuid4()
 def log(level, message):
 	if logs:
-		logging.log(level, session+": "+message)
+		logging.log(level, str(session)+": "+message)
 
 
 # save a file with the body of contents to a file named filename
