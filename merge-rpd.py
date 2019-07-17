@@ -41,7 +41,7 @@ import csv
 # Input Parameters
 rpd_password = "Password01"
 admin_tool_exe = "C:\\Oracle\\OBIEEClient\\bi\\bitools\\bin\\admintool.cmd"
-logs = true
+logs = True
 # End Input Parameters
 
 # write to the log
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 				copy_file(current_rpd_path, current_rpd_path+rpd_extension, True)
 				copy_file(modified_rpd_path, modified_rpd_path+rpd_extension, True)
 			except Exception as e:
-				throw new Exception("Error when preparing RPD files: "+str(e))
+				raise Exception("Error when preparing RPD files: "+str(e))
 	
 			# decisions file must not be empty
 			write_file(decisions_temp_file, "Decision\n")
@@ -191,7 +191,7 @@ if __name__ == "__main__":
 				delete_file(command_file_name)
 				delete_file(decisions_temp_file)
 			except Exception as e:
-				throw new Exception("Error when releasing resources: "+str(e))
+				raise Exception("Error when releasing resources: "+str(e))
 		elif action == "diff":
 			# diff actions
 			# validate inputs
@@ -232,7 +232,7 @@ if __name__ == "__main__":
 				delete_file(command_file_name)
 				delete_file(output_file_path)
 			except Exception as e:
-				throw new Exception("Error releasing resources: "+str(e))
+				raise Exception("Error releasing resources: "+str(e))
 			print(output_string)
 		else:
 			log(logging.ERROR, "No valid action: "+action)
