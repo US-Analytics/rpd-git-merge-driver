@@ -46,7 +46,7 @@ logs = True
 # End Input Parameters
 
 # write to the log
-session = uuid.uuid4()
+session = str(uuid.uuid4())
 def log(level, message):
 	if logs:
 		logging.log(level, str(session)+": "+message)
@@ -91,11 +91,11 @@ def copy_file(orig, dest, delete=False):
 
 			
 # perform the three way merge for the RPD		
-def three_way_merge(original, a_current, b_modified, output_name, password, command_file_name):
+def three_way_merge(original, a_current, b_modified, output_name, password, decisions_file_path, command_file_name):
 	try:
 		log(logging.DEBUG, "Starting 3 way merge.")
 		command_body = "OpenOffline " + a_current + " " + password
-		command_body += "\nMerge "+original+" "+b_modified+" decisions.csv "+password+" "+password+" "+output_name
+		command_body += "\nMerge "+original+" "+b_modified+" "+decisions_file_path+" "+password+" "+password+" "+output_name
 		command_body += "\nSaveAs "+output_name
 		command_body += "\nClose"
 		command_body += "\nExit"
@@ -145,10 +145,18 @@ def execute_rpd_commands(command_file_name):
 # main method	
 if __name__ == "__main__":
 	try:
+		#where to store everything
+		script_folder = os.path.dirname(__file__)+os.path.sep
+		repository_path = os.getcwd()+os.path.sep
+		tmp_folder=script_folder+"tmp"+os.path.sep
+		if not os.path.exists(tmp_folder):
+			os.makedirs(tmp_folder)
+		
 		# setting up logging
 		if logs:
-			logging.basicConfig(filename=os.path.abspath(__file__)+".log",level=logging.DEBUG)
+			logging.basicConfig(filename=script_folder+"output.log",level=logging.DEBUG)
 
+		# validate action	
 		if len(sys.argv) <= 1:
 			log(logging.ERROR, "No action argument provided.")
 			raise Exception("Not enough arguments.")
@@ -165,12 +173,11 @@ if __name__ == "__main__":
 			original_rpd_path = sys.argv[2]
 			current_rpd_path = sys.argv[3]
 			modified_rpd_path = sys.argv[4]
-			repository_path = os.getcwd()
 			
 			# some constants we need
-			command_file_name = repository_path+os.path.sep+"commands.usa"
+			command_file_name = tmp_folder+session+".commands.usa"
 			rpd_extension = ".rpd"
-			decisions_temp_file = repository_path+os.path.sep+"decisions.csv"
+			decisions_tmp_file = tmp_folder+session+".decisions.csv"
 			
 			# files must have the .rpd extension, so we add it
 			try:
@@ -181,10 +188,10 @@ if __name__ == "__main__":
 				raise Exception("Error when preparing RPD files: "+str(e))
 	
 			# decisions file must not be empty
-			write_file(decisions_temp_file, "Decision\n")
+			write_file(decisions_tmp_file, "Decision\n")
 			
 			# perform the merge
-			three_way_merge(original_rpd_path+rpd_extension, current_rpd_path+rpd_extension, modified_rpd_path+rpd_extension, current_rpd_path, rpd_password, command_file_name)
+			three_way_merge(repository_path+original_rpd_path+rpd_extension, repository_path+current_rpd_path+rpd_extension, repository_path+modified_rpd_path+rpd_extension, repository_path+current_rpd_path, rpd_password, decisions_tmp_file, command_file_name)
 			
 			# delete all the temp files we created
 			try:
@@ -192,7 +199,7 @@ if __name__ == "__main__":
 				delete_file(modified_rpd_path+rpd_extension)
 				delete_file(original_rpd_path+rpd_extension)
 				delete_file(command_file_name)
-				delete_file(decisions_temp_file)
+				delete_file(decisions_tmp_file)
 			except Exception as e:
 				raise Exception("Error when releasing resources: "+str(e))
 		elif action == "diff":
@@ -208,8 +215,8 @@ if __name__ == "__main__":
 			repository_path = os.getcwd()
 			
 			# constants we need
-			output_file_path = repository_path+os.path.sep+"comparison_output.csv"
-			command_file_name = repository_path+os.path.sep+"commands.usa"
+			output_file_path = tmp_folder+session+".comparison_output.csv"
+			command_file_name = tmp_folder+session+".commands.usa"
 			
 			# execute the compareRPD using the two files, saving as a CSV file
 			compare_rpd(second_file, first_file, output_file_path, rpd_password, command_file_name)
