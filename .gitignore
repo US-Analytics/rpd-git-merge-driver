@@ -1,7 +1,4 @@
 # USA Commands
-tmp/*.commands.usa
-tmp/*.comparison_output.csv
-tmp/*.decisions.csv
-tmp/.*.rpd
+tmp/
 output.log
 *.swp
