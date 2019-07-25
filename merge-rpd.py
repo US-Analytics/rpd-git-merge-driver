@@ -226,7 +226,7 @@ if __name__ == "__main__":
 			with open(output_file_path, "r") as csv_file:
 				reader = csv.reader(csv_file)
 				output_string += "diff --git a/"+my_file+" b/"+my_file
-				output_string += "\n@@ -1, 1 @@"
+				output_string += "\n@@ -1, 2 @@"
 				for row in reader:
 					item_name = str(row[0])
 					item_change = str(row[1])
