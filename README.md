@@ -13,7 +13,7 @@ A custom Git merge and diff driver to merge binary RPD files. The script configu
 2. Move the 'merge-rpd.py' script to a location on the machine. Make sure the script has permissions to write files in this location.
 3. Open the 'merge-rpd.py' script using the editor of your choice, and update lines 43, 44, and 45.
 4. These variables should be set to the RPD password, the path to the Admin Tool executable, and a boolean flag (True or False) to log debug messages, respectively.
-5. Ensure all Windows paths are represented using '\\' instead of '\'. Save and close the script.
+5. Ensure all Windows paths are represented using '\\\\' instead of '\\'. Save and close the script.
 6. Add the 'merge-rpd.py' script to the PATH environment variable. This can be done by adding the containing folder to the PATH environment variable. Ensure it can be called from the command line via "merge-rpd.py". 
 7. Copy the contents of the provided '.gitattributes' file to the '.gitattributes' file in the RPD Git repository (not this repository).
 8. If this file does not exist, copy the provided '.gitattributes' file to the RPD Git repository. Confirm the file is '.gitattributes' and not '.gitattributes.txt'.
